@@ -51,6 +51,7 @@ const userSchema = new Schema({
 //     next();
 // }); // Whenever some other field is changed(for example, avatar), password is also changed
 
+// password encryption before saving
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {
         return next();
