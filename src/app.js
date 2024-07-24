@@ -1,4 +1,4 @@
-import express from express;
+import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser"; // to perform CRUD operations on cookies in the user's browser
 
@@ -23,5 +23,13 @@ app.use(express.urlencoded({
 app.use(express.static("public")); // to store assets (images, files, etc)
 
 app.use(cookieParser());
+
+// import router
+import userRouter from "./routes/user.route.js";
+// declare routes
+// app.use("/users",userRouter); // when /user is accessed, control is handed over to userRouter
+// http://localhost:8000/users
+app.use("/api/v1/users", userRouter);
+// http://localhost:8000/api/v1/users
 
 export { app }; // export default app
