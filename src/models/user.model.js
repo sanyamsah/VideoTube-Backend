@@ -57,6 +57,7 @@ userSchema.pre("save", async function (next) {
         return next();
     } // if password is not changed, move to next step
     this.password = await bcrypt.hash(this.password, 10); // 10 stands for rounds in the hashing algo
+    // encryption takes time
     next();
 });
 
