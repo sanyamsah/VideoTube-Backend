@@ -6,13 +6,13 @@ import { ApiResponse } from "../utils/apiResponse.js";
 
 // asyncHandler takes a function
 const registerUser = asyncHandler(async (req, res) => {
-    res.status(200).json({
-        message: "Okay"
-    });
-
+    // res.status(200).json({
+    //     message: "Okay"
+    // });
+    // console.log(req.body);
     // get user details from frontend......................................................
     const { fullName, email, username, password } = req.body; // object destructuring
-    console.log("Email: ", email);
+    // console.log("Email: ", email);
 
     // validation..........................................................................
     // if(fullName === ""){
@@ -20,7 +20,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // }
     if (
         [fullName, email, username, password].some((field) => field?.trim() === "")
-        // returns true if any field is empty even after trim
+        // returns true if any field is empty even after trim | Optional chaining
     ) {
         throw new ApiError(400, "Field is required.");
     }
@@ -32,12 +32,14 @@ const registerUser = asyncHandler(async (req, res) => {
     // }
 
     // check if user already exists.........................................................
-    const existingUser = User.findOne({
+    const existingUser = await User.findOne({
         $or: [{ email }, { username }] // checks if email or username already exists
     });
     if (existingUser) {
         throw new ApiError(409, "Email or Username already exists");
     }
+
+    console.log(req.files);
 
     // image handeling......................................................................
     const avatarLocalPath = req.files?.avatar[0]?.path; // files from multer, ? for if can be accessed or not
@@ -45,7 +47,12 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!avatarLocalPath) {
         throw new ApiError("400", "Avatar file required.");
     }
-    const coverImageLocalPath = req.files?.coverImage[0]?.path; // might exist, might not
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path; // might exist, might not
+    // // Optional chaining | Error: Cannot read properties of undefined (reading '0')
+    let coverImageLocalPath;
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
+        coverImageLocalPath = req.files.coverImage[0].path;
+    }
 
     // upload them to cloudinary............................................................
     const avatar = await uploadOnCloudinary(avatarLocalPath);
@@ -71,7 +78,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // return response...................................................................
     return res.status(201).json(
-        new ApiResponse(200,userCreated,"User registered successfully.")
+        new ApiResponse(200, userCreated, "User registered successfully.")
     );
 });
 
