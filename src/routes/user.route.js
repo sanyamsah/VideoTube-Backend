@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { registerUser } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logoutUser } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
+import { verityJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
+
 router.route("/register").post(
     upload.fields([ // takes an array
         { 
@@ -16,5 +18,9 @@ router.route("/register").post(
     ]), // returns middlewares which process multiple files from the fields
     registerUser
 ); // post method, not get: check right one on postman
+
+router.route("/login").post(loginUser);
+
+router.route("/logout").post(verityJWT, logoutUser);
 
 export default router;
